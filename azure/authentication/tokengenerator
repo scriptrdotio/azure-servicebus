@@ -1,0 +1,69 @@
+var log = require("log"); log.setLevel("info");
+var CryptoJS = require("../util/hmac-sha256.js").CryptoJS;
+var base64 = require("../util/base64");
+var busConfig = require("../servicebus/config");
+
+const DEFAULT_EXP = 3600;
+const DEFAULT_KEY_NAME = "SendListen";
+
+/*
+ * signature-string = SHA-256('https://<yournamespace>.servicebus.windows.net/'+'\n'+ 1438205742)
+ * SharedAccessSignature sig=<signature-string>&se=<expiry>&skn=<keyName>&sr=<URL-encoded-resourceURI>
+ * @function generateSignature
+ * @param {Object} params: expected parameters
+ * @param {Numeric} expiry in seconds e.g. 1438205742 (date in seconds). Optional, defaults to DEFAULT_EXP
+ * @param {String} keyName: hask key name (actually the name of the policy). Optional, defaults to /azure/servicebus/config.policy
+ * @param {String} key: the secret key to use to generate the hash. Defaults to /azure/servicebus/config.hashKey
+ * @param {String} resource: the targeted resource on the service, e.g.https://<yournamespace>.servicebus.windows.net/testqueue
+ */
+function generateSignature(params) {  
+
+    if (!params || !params.resource) {
+
+        throw {
+
+            errorCode: "Missing_Parameter",
+            errorDetail: "azure/authentication.generateSignature: you need to provide a resource"
+        };
+    }
+
+    var expiry = 1500554379; //params.expiry;
+    if (!expiry) {
+
+        expiry = Math.round(new Date().getTime() / 1000) + DEFAULT_EXP;
+        log.warn("azure/authentication.generateSignature: no expiry defined, setting it to default value " +  DEFAULT_EXP);
+    }
+
+    var keyName = params.keyName; 
+    if (!keyName) {
+
+        keyName = busConfig.policy;
+        log.warn("azure/authentication.generateSignature: no keyName defined, setting it to default (config) value " +  keyName);
+    }
+
+    var key = params.key; 
+    if (!key) {
+
+        key = busConfig.hashKey;
+        log.warn("azure/authentication.generateSignature: no key defined, setting it to default (config) value");
+    }    
+
+    var signatureString = encodeURIComponent(params.resource) + '\n' + expiry; 
+    var hash = _getHash(key, signatureString);
+    var sharedSignature = "sig=" + encodeURIComponent(hash) + "&se=" + expiry + "&skn=" + keyName + "&sr=" + encodeURIComponent(params.resource);
+    return sharedSignature;
+} 
+
+function _getHash(key, signatureString) {
+    
+    var hash = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, key).update(signatureString).finalize()
+    return base64.stringify(hash)
+};
+
+function hex2a(hexx) {
+    var hex = hexx.toString(); //force conversion
+    var str = '';
+    for (var i = 0; i < hex.length; i += 2)
+        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    return str;
+}

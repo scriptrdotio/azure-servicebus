@@ -1,0 +1,34 @@
+var http = require("http");
+var tokengenerator = require("/azure/authentication/tokengenerator");
+
+try {
+    // generate an authentication token
+    var sigParams = {       
+        resource: "https://scriptrio.servicebus.windows.net/testqueue" 
+    };
+    
+    var token = tokengenerator.generateSignature(sigParams);
+    console.log("token " + token);
+    
+    // validate the token
+    var reqParams = {
+        
+        url: "https://scriptrio.servicebus.windows.net/testqueue/messages",
+        headers: {
+            "Authorization": " SharedAccessSignature " + token,
+            "Content-Type": "application/atom+xml;type=entry;charset=utf-8"
+        },
+        bodyString: '<string xmlns="http://schemas.microsoft.com/2003/10/Serialization/">Hello from scriptr</string>',
+        method: "POST"
+    };
+    
+    var resp = http.request(reqParams);
+    if (resp.status == "201") {
+        console.log("success");
+    }
+    
+    return resp;
+    
+}catch(exception) {
+    return exception;
+}
