@@ -27,7 +27,7 @@ function generateSignature(params) {
         };
     }
 
-    var expiry = 1500554379; //params.expiry;
+    var expiry = params.expiry;
     if (!expiry) {
 
         expiry = Math.round(new Date().getTime() / 1000) + DEFAULT_EXP;
