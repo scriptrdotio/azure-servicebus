@@ -6,14 +6,13 @@ var defaultNameSpace = "scriptrio.servicebus.windows.net";
 
 var defaultResourceGroupName = "connector";
 
-var defaultApiVersion = "2015-08-01";
+var defaultApiVersion = "";
 
 var defaultSubscriptionId = "275e2b4d-b936-49de-96a6-9e5bc9d41bbd";
 
-var queueConfig = {
-    "scriptrio.servicebus.windows.net/testqueue": {
+var queueConfig = {};
+ queueConfig[defaultNameSpace + "/testqueue"] = {
         "resourceGroupName": defaultResourceGroupName,
-        "api-version": defaultApiVersion,
+        "apiVersion": defaultApiVersion,
         "subscriptionId": defaultSubscriptionId
-    }
-};
+    };
