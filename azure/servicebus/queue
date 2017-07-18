@@ -1,0 +1,29 @@
+var config = require("./config");
+
+function Queue(params){
+    if (!params){
+        throw {
+            "errorCode": "Missing_Parameter",
+            "errorDetail": "Client and Path - Params cannot be null or empty"
+        };
+    }
+    this.client = params.client;
+    this.path = params.path;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
