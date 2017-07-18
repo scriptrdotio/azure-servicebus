@@ -1,0 +1,53 @@
+var config = require("/azure/servicebus/config");
+
+function QueueManager(params){
+    if (!params || !params.client){
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Client is a mandatory field"
+        };
+    }
+    
+    this.client = params.client;
+}
+
+QueueManager.prototype.getQueue = function(params){
+    if (!params || !params.queueName){
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "QueueName is a mandatory field"
+        };
+    }
+    
+    var namespace = params.namespaceName ? params.namespaceName : config.defaultNameSpace;
+	var key = namespace + "/" + params.queueName;
+    var queueConfig = config.queueConfig[key];
+    var resourceGroupName = params.resourceGroupName ? params.resourceGroupName : queueConfig.resourceGroupName;
+    var apiVersion = params.apiVersion ? params.apiVersion : queueConfig.apiVersion;
+    var subscriptionId = params.subscriptionId ? params.subscriptionId : queueConfig.subscriptionId;
+    
+    var reqParams = {
+        "url": "https://" + namespace + "/subscriptions/"+ subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.ServiceBus/namespaces/" + namespace + "/queues/" + params.queueName + (apiVersion ? "?api-version=" + apiVersion : ""),
+        "method": "GET"
+    };
+    
+    return this.client.callApi(reqParams);
+}
+
+QueueManager.prototype.listQueues = function(params){
+    
+    var namespace = params.namespaceName ? params.namespaceName : config.defaultNameSpace;
+	var key = namespace + "/" + params.queueName;
+    var queueConfig = config.queueConfig[key];
+    var resourceGroupName = params.resourceGroupName ? params.resourceGroupName : queueConfig.resourceGroupName;
+    var apiVersion = params.apiVersion ? params.apiVersion : queueConfig.apiVersion;
+    var subscriptionId = params.subscriptionId ? params.subscriptionId : queueConfig.subscriptionId;
+    
+    var reqParams = {
+        
+        "url": "https://" + namespace + "/subscriptions/"+ subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.ServiceBus/namespaces/" + namespace + "/queues" + (apiVersion ? "?api-version=" + apiVersion : ""),
+        "method": "GET"
+    }
+    
+    return client.callApi(reqParams);
+}
