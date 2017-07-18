@@ -40,9 +40,10 @@ function Client(dto) {
             "errorDetail": "Client - dto.resource cannot be null or empty. You should specify the url of the resource"
         };
     }
+    
 	var myTokenGenerator = new tokenGenerator.TokenGenerator();
-    this.accessToken = myTokenGenerator.loadToken(dto.resource);
-    console.log(accessToken);
+    this.accessToken = myTokenGenerator.loadToken(dto);
+    console.log(this.accessToken);
 }
 
 /**
@@ -79,14 +80,14 @@ Client.prototype._callApi = function(params) {
 
     params.url = params.url;
     params.headers = {
-        "Authorization": "SharedAccessSignature " + accessToken //this.tokenGenerator.getSignature(dto.resource)
+        "Authorization": "SharedAccessSignature " + this.accessToken //this.tokenGenerator.getSignature(dto.resource)
     };
 
     console.log(JSON.stringify(params));
     var response = http.request(params);
     console.log("Received following response  : " + JSON.stringify(response));
     if (response.status >= "200" && response.status < "300") {
-        var responseBody = JSON.parse(response.body);
+        var responseBody = response.body ? xmlToJson(response.body) : "";
         if (responseBody.message) {
             throw response;
         }else {
@@ -94,8 +95,8 @@ Client.prototype._callApi = function(params) {
         }
     }else {
         throw {
-            errorCode: ERRROR_MSGS[response.status].errorCode,
-            errorDetail: ERRROR_MSGS[response.status].errorDetail
+            errorCode: ERROR_MSGS["" + response.statusCode].errorCode,
+            errorDetail: ERROR_MSGS["" + response.statusCode].errorDetail
         };
     } /*
     if (response.status == "400"){
