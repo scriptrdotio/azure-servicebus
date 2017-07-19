@@ -1,0 +1,56 @@
+var config = require("/azure/servicebus/config");
+var topicModule = require("/azure/servicebus/topic");
+
+function TopicManager(params){
+    if (!params || !params.client){
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Client is a mandatory field"
+        };
+    }
+    
+    this.client = params.client;
+}
+
+TopicManager.prototype.getTopic = function(params){
+    if (!params || !params.topicName){
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "TopicName is a mandatory field"
+        };
+    }
+    
+    var namespace = params.namespaceName ? params.namespaceName : config.defaultNameSpace;
+	var key = namespace + "/" + params.topicName;
+    var topicConfig = config.topicConfig[key];
+    var resourceGroupName = params.resourceGroupName ? params.resourceGroupName : topicConfig.resourceGroupName;
+    var apiVersion = params.apiVersion ? params.apiVersion : topicConfig.apiVersion;
+    var subscriptionId = params.subscriptionId ? params.subscriptionId : topicConfig.subscriptionId;
+    
+    var reqParams = {
+        "url": "https://" + namespace + "/subscriptions/"+ subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.ServiceBus/namespaces/" + 				namespace + "/topics/" + params.topicName + (apiVersion ? "?api-version=" + apiVersion : ""),
+        "method": "GET"
+    };
+    
+    var topic = topicModule;
+    topic = this.client.callApi(reqParams);
+    return topic;
+}
+
+TopicManager.prototype.listTopics = function(params){
+    
+    var namespace = params.namespaceName ? params.namespaceName : config.defaultNameSpace;
+	var key = namespace + "/" + params.topicName;
+    var topicConfig = config.topicConfig[key];
+    var resourceGroupName = params.resourceGroupName ? params.resourceGroupName : topicConfig.resourceGroupName;
+    var apiVersion = params.apiVersion ? params.apiVersion : topicConfig.apiVersion;
+    var subscriptionId = params.subscriptionId ? params.subscriptionId : topicConfig.subscriptionId;
+    
+    var reqParams = {
+        
+        "url": "https://" + namespace + "/subscriptions/"+ subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.ServiceBus/namespaces/" + namespace + "/topics" + (apiVersion ? "?api-version=" + apiVersion : ""),
+        "method": "GET"
+    }
+    
+    return client.callApi(reqParams);
+}
