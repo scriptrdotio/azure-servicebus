@@ -1,0 +1,13 @@
+var config = require("./config");
+
+function Topic(params){
+    if (!params){
+        throw {
+            "errorCode": "Missing_Parameter",
+            "errorDetail": "Client and Name - Params cannot be null or empty"
+        };
+    }
+    this.client = params.client;
+    this.name = params.name;
+}
+
