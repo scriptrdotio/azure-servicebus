@@ -1,17 +1,21 @@
 var http = require("http");
-var tokengenerator = require("/azure/authentication/tokengenerator");
+var tokengeneratorModule = require("/azure/authentication/tokengenerator");
+var queuemanagerModule = require("/azure/servicebus/queuemanager");
+var topicmanagerModule = require("/azure/servicebus/topicmanager");
+var clientModule = require("/azure/servicebus/client");
 
 try {
     // generate an authentication token
     var sigParams = {       
-        resource: "https://scriptrio.servicebus.windows.net/testqueue" 
+        resource: "https://scriptrio.servicebus.windows.net/testtopic" 
     };
-    
+   /* 
+    var tokengenerator = new tokengeneratorModule.TokenGenerator();
     var token = tokengenerator.generateSignature(sigParams);
-    console.log("token " + token);
+    console.log("token " + token);*/
     
     // validate the token
-    var reqParams = {
+    /*var reqParams = {
         
         url: "https://scriptrio.servicebus.windows.net/testqueue/messages",
         headers: {
@@ -26,8 +30,16 @@ try {
     if (resp.status == "201") {
         console.log("success");
     }
+    */
     
-    return resp;
+    var client = new clientModule.Client(sigParams);
+    
+    /*
+    var queuemanager = new queuemanagerModule.QueueManager({client: client});
+    return queuemanager.getQueue({queueName: "testqueue"});*/
+    
+    var topicmanager = new topicmanagerModule.TopicManager({client: client});
+    return topicmanager.getTopic({topicName: "testtopic"});
     
 }catch(exception) {
     return exception;
