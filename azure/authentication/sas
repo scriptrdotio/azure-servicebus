@@ -22,7 +22,7 @@ SAS.prototype.generateSignature = function (params) {
     if (!expiry) {
 
         expiry = Math.round(new Date().getTime() / 1000) + DEFAULT_EXP;
-        log.warn("azure/authentication.generateSignature: no expiry defined, setting it to default value " +  DEFAULT_EXP);
+        log.warn("azure/authentication/sas.generateSignature: no expiry defined, setting it to default value " +  DEFAULT_EXP);
     }
 
     var keyName = params.keyName; 
