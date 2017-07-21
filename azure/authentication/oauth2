@@ -1,0 +1,29 @@
+var http = require("http");
+
+function Oauth2(){}
+
+Oauth2.prototype.generateSignature = function(){
+    var targetResource = "https://management.azure.com/";
+    var reqParams = {
+        grant_type: "client_credentials",
+        client_id: "0b250c56-2acd-42c1-b5b8-70c409eb0253",
+        client_secret: "LyL6GERHQNi9obGGiiImttk4K+ggXCE6HkScV0y0pwg=",
+        resource: targetResource
+    };
+
+    var apiReq = {
+        "headers": {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        "url": "laxhttps://login.microsoftonline.com/c74a3208-e04c-444f-a867-66976a801895/oauth2/token",
+        "method": "POST",
+        "params": reqParams
+    };
+
+    var resp = http.request(apiReq);
+    var parsedBody = JSON.parse(resp.body);
+    return {
+        token: parsedBody.access_token,
+        expiry: parsedBody.expires_in
+    };
+}

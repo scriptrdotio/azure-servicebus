@@ -1,0 +1,55 @@
+var log = require("log"); log.setLevel("info");
+var CryptoJS = require("../util/hmac-sha256.js").CryptoJS;
+var base64 = require("../util/base64");
+var busConfig = require("../servicebus/config");
+
+const DEFAULT_EXP = 3600;
+const DEFAULT_KEY_NAME = "SendListen";
+
+function SAS(){}
+
+SAS.prototype.generateSignature = function (params) {  
+
+    if (!params || !params.resource) {
+
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "azure/authentication.generateSignature: you need to provide a resource"
+        };
+    }
+
+    var expiry = params.expiry;
+    if (!expiry) {
+
+        expiry = Math.round(new Date().getTime() / 1000) + DEFAULT_EXP;
+        log.warn("azure/authentication.generateSignature: no expiry defined, setting it to default value " +  DEFAULT_EXP);
+    }
+
+    var keyName = params.keyName; 
+    if (!keyName) {
+
+        keyName = busConfig.policy;
+        log.warn("azure/authentication.generateSignature: no keyName defined, setting it to default (config) value " +  keyName);
+    }
+
+    var key = params.key; 
+    if (!key) {
+
+        key = busConfig.hashKey;
+        log.warn("azure/authentication.generateSignature: no key defined, setting it to default (config) value");
+    }    
+
+    var signatureString = encodeURIComponent(params.resource) + '\n' + expiry; 
+    var hash = this._getHash(key, signatureString);
+    var sharedSignature = "sig=" + encodeURIComponent(hash) + "&se=" + expiry + "&skn=" + keyName + "&sr=" + encodeURIComponent(params.resource);
+    return {
+        token: sharedSignature,
+        expiry: expiry
+    };
+};
+
+SAS.prototype._getHash = function(key, signatureString) {
+
+    var hash = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, key).update(signatureString).finalize()
+    return base64.stringify(hash)
+};

@@ -1,0 +1,26 @@
+var sasModule = require("./sas")
+var oauth2Module = require("./oauth2")
+
+function AuthModeFactory(){}
+
+AuthModeFactory.prototype.getAuthStrategy =function(params){
+
+    switch (params.authMode){
+        case "sas" : return this.handleSas(params);
+        case "oauth2" : return this.handleOauth2(params);
+        default: {
+            log.warn("The token generator is using the default authentication mode: OAuth2");
+            return this.handleOauth2(params);
+        };
+    }
+};
+
+AuthModeFactory.prototype.handleSas = function(params){
+    var sas = new sasModule.SAS();
+    return sas;
+};
+
+AuthModeFactory.prototype.handleOauth2 = function(params){
+    var oauth2 = new oauth2Module.Oauth2();
+    return oauth2;
+};
