@@ -14,7 +14,7 @@ SAS.prototype.generateSignature = function (params) {
 
         throw {
             errorCode: "Missing_Parameter",
-            errorDetail: "azure/authentication.generateSignature: you need to provide a resource"
+            errorDetail: "azure/authentication/sas.generateSignature: you need to provide a resource"
         };
     }
 
@@ -29,14 +29,14 @@ SAS.prototype.generateSignature = function (params) {
     if (!keyName) {
 
         keyName = busConfig.policy;
-        log.warn("azure/authentication.generateSignature: no keyName defined, setting it to default (config) value " +  keyName);
+        log.warn("azure/authentication/sas.generateSignature: no keyName defined, setting it to default (config) value " +  keyName);
     }
 
     var key = params.key; 
     if (!key) {
 
         key = busConfig.hashKey;
-        log.warn("azure/authentication.generateSignature: no key defined, setting it to default (config) value");
+        log.warn("azure/authentication/sas.generateSignature: no key defined, setting it to default (config) value");
     }    
 
     var signatureString = encodeURIComponent(params.resource) + '\n' + expiry; 
