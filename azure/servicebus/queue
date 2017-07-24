@@ -11,6 +11,66 @@ function Queue(params){
     this.path = params.path;
 }
 
+Queue.prototype.popMessage = function(){
+    var reqParams = {
+        "url":"https://" + config.defaultNameSpace + "/" + this.path + "/messages/head",
+        "method": "DELETE",
+        "authMode": "sas",
+        "resource": "https://scriptrio.servicebus.windows.net/testqueue"
+    };
+
+    return this.client.callApi(reqParams); 
+};
+
+Queue.prototype.readLockMessage = function(){
+    var reqParams = {
+        "url": "https://" + config.defaultNameSpace + "/" + this.path + "/messages/head",
+        "method": "POST",
+        "authMode": "sas",
+        "resource": "https://scriptrio.servicebus.windows.net/testqueue"
+    };
+
+    return this.client.callApi(reqParams); 
+};
+
+Queue.prototype.sendMessage = function(message){
+    if (!message){
+        throw {
+            "errorCode": "Missing_Parameter",
+            "errorDetail": "Message - Parameter cannot be null or empty"
+        };
+    }
+
+    var reqParams = {
+        "url": "https://" + config.defaultNameSpace + "/" + this.path + "/messages",
+        "method": "POST",
+        "bodyString": '<string xmlns="http://schemas.microsoft.com/2003/10/Serialization/">' + JSON.stringify(message) + '</string>',
+        "authMode": "sas",
+        "resource": "https://scriptrio.servicebus.windows.net/testqueue"
+    };
+
+    return this.client.callApi(reqParams); 
+}
+
+Queue.prototype.sendMessageBatch = function(messageList){
+    if (!messageList){
+        throw {
+            "errorCode": "Missing_Parameter",
+            "errorDetail": "Message - Parameter cannot be null or empty"
+        };
+    }
+
+    var reqParams = {
+        "url": "https://" + config.defaultNameSpace + "/" + this.path + "/messages/head",
+        "method": "POST",
+        "Content-Type": application/vnd.microsoft.servicebus.json,
+        "Body": messageList,
+        "authMode": "sas",
+        "resource": "https://scriptrio.servicebus.windows.net/testqueue"
+    };
+
+    return this.client.callApi(reqParams);
+}
 
 
 
