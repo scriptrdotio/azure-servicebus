@@ -1,10 +1,14 @@
 var http = require("http");
 var tokenGenerator = require("/azure/authentication/tokengenerator");
 
-const ERROR_MSGS = {
+/*const ERROR_MSGS = {
     "400": {
         code: "Remote_API_Error",
         detail: "Bad request."
+    },
+    "404": {
+        code: "Remote_API_Error",
+        detail: "Not Found."
     },
     "410": {
         code: "Invalid_Queue_Subscription",
@@ -14,7 +18,7 @@ const ERROR_MSGS = {
         code: "Internal Error",
         detail: "Bad Request."
     }
-};
+};*/
 
 /**
  * A generic http client that handles the communication with remote APIs
@@ -40,10 +44,8 @@ function Client(dto) {
             "errorDetail": "Client - dto.resource cannot be null or empty. You should specify the url of the resource"
         };
     }
-    
-	var myTokenGenerator = new tokenGenerator.TokenGenerator();
-    this.accessToken = myTokenGenerator.loadToken(dto);
-    console.log(this.accessToken);
+
+    this.authMode = dto.authMode;
 }
 
 /**
@@ -61,7 +63,7 @@ Client.prototype.callApi = function(params) {
     try {   
         return this._callApi(params);
     } catch(response) {
-
+		console.log("callAPI " + JSON.stringify(response));
         var status = Number(response.status);
         if (status == 401) {
             this._refreshToken();        
@@ -77,11 +79,26 @@ Client.prototype.callApi = function(params) {
 };
 
 Client.prototype._callApi = function(params) {
+	var paramsClone = JSON.parse(JSON.stringify(params));
+    paramsClone.authMode = params.authMode ? params.authMode : this.authMode;
+    var myTokenGenerator = new tokenGenerator.TokenGenerator();
+    this.accessToken = myTokenGenerator.loadToken(params).token;
+    console.log("Access Token: "+this.accessToken);
 
     params.url = params.url;
-    params.headers = {
-        "Authorization": "SharedAccessSignature " + this.accessToken //this.tokenGenerator.getSignature(dto.resource)
-    };
+    switch(paramsClone.authMode){
+        case "sas": params.headers = {
+            "Authorization": "SharedAccessSignature " + this.accessToken
+        };
+            break;
+        case "oauth2": params.headers = {
+            "Authorization": "Bearer " + this.accessToken
+        };
+            break;
+        default: params.headers = {
+            "Authorization": "Bearer " + this.accessToken
+        };
+    }
 
     console.log(JSON.stringify(params));
     var response = http.request(params);
@@ -95,34 +112,16 @@ Client.prototype._callApi = function(params) {
         }
     }else {
         throw {
-            errorCode: ERROR_MSGS["" + response.statusCode].errorCode,
-            errorDetail: ERROR_MSGS["" + response.statusCode].errorDetail
+            errorCode: response.status,
+            errorDetail: JSON.stringify(response.body)
         };
-    } /*
-    if (response.status == "400"){
-        throw {
-            errorCode:"Remote_API_Error",
-            errorDetail:"Bad request."
-        };
-    }else if (response.status == "410"){
-        throw {
-            errorCode:"Invalid_Queue_Subscription",
-            errorDetail:"Specified queue or subscription does not exist."
-        };
-    }else if (response.status == "500"){
-        throw {
-            errorCode:"Internal_Error",
-            errorDetail:"Internal Error (" +  ."
-        };
-    }else {
-        throw response;
-    }*/
+    }
 };
 
 Client.prototype._refreshToken = function(resource) {
 
     console.log("Refreshing token for " +  resource);
-    
+
     var myTokenGenerator = new tokenGenerator.TokenGenerator();
     myTokenGenerator.getSignature(resource);
 };
@@ -131,10 +130,10 @@ Client.prototype._handleError = function(response) {
 
     var errorObj = "";
     try {
-
-        errorObj = JSON.parse(response.body);
+		console.log(JSON.stringify(response));
+        errorObj = response.body;
     }catch(e) {
-
+        console.log(JSON.stringify(e));
         try {
             errorObj = JSON.parse(response);
         }catch(e) {
@@ -144,7 +143,7 @@ Client.prototype._handleError = function(response) {
 
     throw {
         "errorCode": "Invocation_Error",
-        "errorDetail": errorObj
+        "errorDetail":errorObj
     };
 };
 
