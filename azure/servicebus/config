@@ -38,3 +38,8 @@ topicConfig[defaultNameSpace] = {
     "apiVersion": defaultApiVersion,
     "subscriptionId": defaultSubscriptionId
 };
+
+topicConfig["defaultAuthData"] = {
+    "authMode": "sas",
+    "resource": "https://scriptrio.servicebus.windows.net/"
+};
