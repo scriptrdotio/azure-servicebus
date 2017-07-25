@@ -16,7 +16,6 @@ function TokenGenerator(){}
 
 TokenGenerator.prototype.loadToken = function(params){
     var queryObj = {
-
         query: 'type = "token" and resource = "' + params.resource +  '" and authMode = "' + params.authMode + '"',
         fields: "*"
     };
@@ -28,27 +27,32 @@ TokenGenerator.prototype.loadToken = function(params){
     }
 
     if (resp.result.documents.length == 0){
-        var authmodefactory = new authmodefactoryModule.AuthModeFactory();
-        var authenticationStrategy = authmodefactory.getAuthStrategy(params);
-        var token = authenticationStrategy.generateSignature(params);
-        
-        log.warn("generating a new token for " + params.resource);
-        var docParam = {
-            type: "token",
-            token: token.token,
-            expiry: token.expiry,
-            resource: params.resource,
-            authMode: params.authMode ? params.authMode : "oauth2",
-            "meta.types": {
-                token: "text"
-            }
-        };
-
-        var resp = document.save(docParam);
-        if (resp.metadata.status == "failure") {
-            log.error("Failed to save token \n " + JSON.stringify(resp) + "\n " + JSON.stringify(docParam));
-        }
-        return token;
+		return this.getSignature(params);
     }
-    return resp.result.documents[0].token;
+    return resp.result.documents[0];
+}
+
+TokenGenerator.prototype.getSignature = function(params){
+    log.info("TokenGenerator.getSignature received " + JSON.stringify(params));
+    var authmodefactory = new authmodefactoryModule.AuthModeFactory();
+    var authenticationStrategy = authmodefactory.getAuthStrategy(params);
+    var token = authenticationStrategy.generateSignature(params);
+
+    log.warn("generating a new token for " + params.resource);
+    var docParam = {
+        type: "token",
+        token: token.token,
+        expiry: token.expiry,
+        resource: params.resource,
+        authMode: params.authMode ? params.authMode : "oauth2",
+        "meta.types": {
+            token: "text"
+        }
+    };
+
+    var resp = document.save(docParam);
+    if (resp.metadata.status == "failure") {
+        log.error("Failed to save token \n " + JSON.stringify(resp) + "\n " + JSON.stringify(docParam));
+    }
+    return token;
 }
