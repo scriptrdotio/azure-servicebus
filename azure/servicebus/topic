@@ -39,7 +39,7 @@ function Topic(params){
 
         this.authData = {
             "authMode": aData.authMode,
-            "resource": aData.resource + params.path
+            "resource": aData.resource + params.name
         };
     }else{
         this.authData = {
