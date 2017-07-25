@@ -1,36 +1,71 @@
 var config = require("./config");
 
+/*
+* @class Queue
+* @constructor
+* @param {Object} [params]: expected parameters
+* @param {Object} [params.client]
+* @param {Object} [params.path]
+*
+* @method popMessage
+* returns {Object} message from Queue and deletes it from Queue
+*
+* @method readLockMessage
+* returns {Object} message from Queue
+* 
+* @method sendMessage
+* @param {String} [message]
+* @ returns nothing
+* @ throw {Error}
+*
+* @method sendMessageBatch
+* @param {String} [messageList]
+* @ returns nothing
+* @ throw {Error}
+*/
+
 function Queue(params){
-    if (!params){
+    if (!params || !params.client || !params.path){
         throw {
             "errorCode": "Missing_Parameter",
-            "errorDetail": "Client and Path - Params cannot be null or empty"
+            "errorDetail": "Client, Path - Params cannot be null or empty"
         };
     }
+
+    if (!params.resource || !params.authMode){
+        var aData = config.topicConfig["defaultAuthData"]
+
+        this.authData = {
+            "authMode": aData.authMode,
+            "resource": aData.resource + params.path
+        };
+    }else{
+        this.authData = {
+            "authMode": params.authMode,
+            "resource": params.resource
+        };
+    }
+    
     this.client = params.client;
     this.path = params.path;
 }
 
 Queue.prototype.popMessage = function(){
     var reqParams = {
-        "url":"https://" + config.defaultNameSpace + "/" + this.path + "/messages/head",
-        "method": "DELETE",
-        "authMode": "sas",
-        "resource": "https://scriptrio.servicebus.windows.net/testqueue"
+        "url":"https://" + config.defaultNameSpace + ".servicebus.windows.net/" + this.path + "/messages/head",
+        "method": "DELETE"
     };
 
-    return this.client.callApi(reqParams); 
+    return this.client.callApi(reqParams, this.authData); 
 };
 
 Queue.prototype.readLockMessage = function(){
     var reqParams = {
-        "url": "https://" + config.defaultNameSpace + "/" + this.path + "/messages/head",
-        "method": "POST",
-        "authMode": "sas",
-        "resource": "https://scriptrio.servicebus.windows.net/testqueue"
+        "url": "https://" + config.defaultNameSpace + ".servicebus.windows.net/" + this.path + "/messages/head",
+        "method": "POST"
     };
 
-    return this.client.callApi(reqParams); 
+    return this.client.callApi(reqParams, this.authData); 
 };
 
 Queue.prototype.sendMessage = function(message){
@@ -42,14 +77,12 @@ Queue.prototype.sendMessage = function(message){
     }
 
     var reqParams = {
-        "url": "https://" + config.defaultNameSpace + "/" + this.path + "/messages",
+        "url": "https://" + config.defaultNameSpace + ".servicebus.windows.net/" + this.path + "/messages",
         "method": "POST",
-        "bodyString": '<string xmlns="http://schemas.microsoft.com/2003/10/Serialization/">' + JSON.stringify(message) + '</string>',
-        "authMode": "sas",
-        "resource": "https://scriptrio.servicebus.windows.net/testqueue"
+        "bodyString": '<string xmlns="http://schemas.microsoft.com/2003/10/Serialization/">' + JSON.stringify(message) + '</string>'
     };
 
-    return this.client.callApi(reqParams); 
+    return this.client.callApi(reqParams, this.authData); 
 }
 
 Queue.prototype.sendMessageBatch = function(messageList){
@@ -61,15 +94,13 @@ Queue.prototype.sendMessageBatch = function(messageList){
     }
 
     var reqParams = {
-        "url": "https://" + config.defaultNameSpace + "/" + this.path + "/messages/head",
+        "url": "https://" + config.defaultNameSpace + ".servicebus.windows.net/" + this.path + "/messages",
         "method": "POST",
         "Content-Type": application/vnd.microsoft.servicebus.json,
-        "Body": messageList,
-        "authMode": "sas",
-        "resource": "https://scriptrio.servicebus.windows.net/testqueue"
+        "Body": messageList
     };
 
-    return this.client.callApi(reqParams);
+    return this.client.callApi(reqParams, this.authData); 
 }
 
 
