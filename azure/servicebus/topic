@@ -1,5 +1,31 @@
 var config = require("./config");
 
+/*
+* @class Topic
+* @constructor
+* @param {Object} [params]: expected parameters
+* @param {Object} [params.client]
+* @param {Object} [params.name]
+*
+* @method popMessage
+* @param {String} [subscriptionName]
+* @returns {Object} message from Queue and deletes it from Queue
+*
+* @method readLockMessage
+* @param {String} [subscriptionName]
+* @returns {Object} message from Queue
+* 
+* @method sendMessage
+* @param {String} [message]
+* @ returns nothing
+* @ throw {Error}
+*
+* @method sendMessageBatch
+* @param {String} [messageList]
+* @ returns nothing
+* @ throw {Error}
+*/
+
 function Topic(params){
     if (!params){
         throw {
@@ -7,7 +33,88 @@ function Topic(params){
             "errorDetail": "Client and Name - Params cannot be null or empty"
         };
     }
+    
+    if (!params.resource || !params.authMode){
+        var aData = config.topicConfig["defaultAuthData"]
+
+        this.authData = {
+            "authMode": aData.authMode,
+            "resource": aData.resource + params.path
+        };
+    }else{
+        this.authData = {
+            "authMode": params.authMode,
+            "resource": params.resource
+        };
+    }
+    
     this.client = params.client;
     this.name = params.name;
 }
 
+Topic.prototype.popMessage = function(subscriptionName){
+    if (!subscriptionName){
+        throw {
+            "errorCode": "Missing_Parameter",
+            "errorDetail": "subscriptionName - Parameter cannot be null or empty"
+        };
+    }
+
+    var reqParams = {
+        "url":"https://" + config.defaultNameSpace + ".servicebus.windows.net/" + this.name + "/subscriptions/" + subscriptionName + "/messages/head",
+        "method": "DELETE"
+    };
+
+    return this.client.callApi(reqParams, this.authData); 
+};
+
+Topic.prototype.readLockMessage = function(subscriptionName){
+    if (!subscriptionName){
+        throw {
+            "errorCode": "Missing_Parameter",
+            "errorDetail": "subscriptionName - Parameter cannot be null or empty"
+        };
+    }
+
+    var reqParams = {
+        "url": "https://" + config.defaultNameSpace + ".servicebus.windows.net/" + this.name + "/subscriptions/" + subscriptionName + "/messages/head",
+        "method": "POST"
+    };
+
+    return this.client.callApi(reqParams, this.authData); 
+};
+
+Topic.prototype.sendMessage = function(message){
+    if (!message){
+        throw {
+            "errorCode": "Missing_Parameter",
+            "errorDetail": "Message - Parameter cannot be null or empty"
+        };
+    }
+
+    var reqParams = {
+        "url": "https://" + config.defaultNameSpace + ".servicebus.windows.net/" + this.name + "/messages",
+        "method": "POST",
+        "bodyString": '<string xmlns="http://schemas.microsoft.com/2003/10/Serialization/">' + JSON.stringify(message) + '</string>'
+    };
+
+    return this.client.callApi(reqParams, this.authData);
+}
+
+Topic.prototype.sendMessageBatch = function(messageList){
+    if (!messageList){
+        throw {
+            "errorCode": "Missing_Parameter",
+            "errorDetail": "Message - Parameter cannot be null or empty"
+        };
+    }
+
+    var reqParams = {
+        "url": "https://" + config.defaultNameSpace + ".servicebus.windows.net/" + this.name + "/messages",
+        "method": "POST",
+        "Content-Type": application/vnd.microsoft.servicebus.json,
+        "Body": messageList
+    };
+
+    return this.client.callApi(reqParams, this.authData);
+}
