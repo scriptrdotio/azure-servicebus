@@ -6,26 +6,7 @@ var config = require("./config");
 * @param {Object} [params]: expected parameters
 * @param {Object} [params.client]
 * @param {Object} [params.name]
-*
-* @method popMessage
-* @param {String} [subscriptionName]
-* @returns {Object} message from Queue and deletes it from Queue
-*
-* @method readLockMessage
-* @param {String} [subscriptionName]
-* @returns {Object} message from Queue
-* 
-* @method sendMessage
-* @param {String} [message]
-* @ returns nothing
-* @ throw {Error}
-*
-* @method sendMessageBatch
-* @param {String} [messageList]
-* @ returns nothing
-* @ throw {Error}
 */
-
 function Topic(params){
     if (!params){
         throw {
@@ -52,7 +33,12 @@ function Topic(params){
     this.name = params.name;
 }
 
-Topic.prototype.popMessage = function(subscriptionName){
+/*
+* @method readMessage
+* @param {String} [subscriptionName]
+* @returns {Object} message from Queue and deletes it from Queue
+*/
+Topic.prototype.readMessage = function(subscriptionName){
     if (!subscriptionName){
         throw {
             "errorCode": "Missing_Parameter",
@@ -68,6 +54,11 @@ Topic.prototype.popMessage = function(subscriptionName){
     return this.client.callApi(reqParams, this.authData); 
 };
 
+/*
+* @method readLockMessage
+* @param {String} [subscriptionName]
+* @returns {Object} message from Queue
+*/
 Topic.prototype.readLockMessage = function(subscriptionName){
     if (!subscriptionName){
         throw {
@@ -78,12 +69,19 @@ Topic.prototype.readLockMessage = function(subscriptionName){
 
     var reqParams = {
         "url": "https://" + config.defaultNameSpace + ".servicebus.windows.net/" + this.name + "/subscriptions/" + subscriptionName + "/messages/head",
-        "method": "POST"
+        "method": "POST",
+        "Content-Type": "application/atom+xml;type=entry;charset=utf-8"
     };
 
     return this.client.callApi(reqParams, this.authData); 
 };
 
+/*
+* @method sendMessage
+* @param {String} [message]
+* @ returns nothing
+* @ throw {Error}
+*/
 Topic.prototype.sendMessage = function(message){
     if (!message){
         throw {
@@ -95,12 +93,20 @@ Topic.prototype.sendMessage = function(message){
     var reqParams = {
         "url": "https://" + config.defaultNameSpace + ".servicebus.windows.net/" + this.name + "/messages",
         "method": "POST",
-        "bodyString": '<string xmlns="http://schemas.microsoft.com/2003/10/Serialization/">' + JSON.stringify(message) + '</string>'
+        "bodyString": '<string xmlns="http://schemas.microsoft.com/2003/10/Serialization/">' + JSON.stringify(message) + '</string>',
+        "Content-Type": "application/atom+xml;type=entry;charset=utf-8",
+        //"bodyString": "<entry xmlns='http://www.w3.org/2005/Atom'> <content type='application/xml'> " + JSON.stringify(message) + "</content> </entry>"
     };
 
     return this.client.callApi(reqParams, this.authData);
-}
+};
 
+/*
+* @method sendMessageBatch
+* @param {String} [messageList]
+* @ returns nothing
+* @ throw {Error}
+*/
 Topic.prototype.sendMessageBatch = function(messageList){
     if (!messageList){
         throw {
@@ -112,9 +118,25 @@ Topic.prototype.sendMessageBatch = function(messageList){
     var reqParams = {
         "url": "https://" + config.defaultNameSpace + ".servicebus.windows.net/" + this.name + "/messages",
         "method": "POST",
-        "Content-Type": application/vnd.microsoft.servicebus.json,
-        "Body": messageList
+        "Content-Type": "application/vnd.microsoft.servicebus.json",
+        "bodyString": JSON.stringify(messageList)
     };
 
     return this.client.callApi(reqParams, this.authData);
-}
+};
+
+/*
+* @method unlock
+* @param {Object} messageId: received in the response of readLockMessage method (response.brokerProperties.MessageId)
+* returns empty string
+*/
+Topic.prototype.unlock = function(messageId){
+    
+    var reqParams = {
+        "url": "https://" + config.defaultNameSpace + ".servicebus.windows.net/" + this.name + "/subscriptions/" + subscriptionName + "/messages/" + messageId,
+        "method": "PUT",
+        "Content-Type": "application/atom+xml;type=entry;charset=utf-8"
+    };
+
+    return this.client.callApi(reqParams, this.authData);
+};
