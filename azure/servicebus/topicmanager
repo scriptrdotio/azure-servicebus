@@ -1,6 +1,33 @@
 var config = require("/azure/servicebus/config");
 var topicModule = require("/azure/servicebus/topic");
 
+/*
+ * @class TopicManager
+ * @constructor
+ * @param {Object} [params]: expected parameters
+ * @param {Object} [params.client]
+ *
+ * @method getTopic
+ * @param {Object} [params]: expected parameters
+ * @param {String} [params.topicName]
+ * @param {String} [params.namespace] (optional) defaults to config.defaultNameSpace
+ * @param {String} [params.resourceGroupName] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].resourceGroupName
+ * @param {String} [params.apiVersion] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].apiVersion
+ * @param {String} [params.subscriptionId] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].subscriptionId
+ * @return {Object} instance of topic
+ * @throw {Error}
+ *
+ * @method listTopics
+ * @param {Object} [params]: expected parameters
+ * @param {String} [params.topicName]
+ * @param {String} [params.namespace] (optional) defaults to config.defaultNameSpace
+ * @param {String} [params.resourceGroupName] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].resourceGroupName
+ * @param {String} [params.apiVersion] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].apiVersion
+ * @param {String} [params.subscriptionId] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].subscriptionId
+ * @return {Object} array of instances of topic
+ * @throw {Error}
+ */
+
 function TopicManager(params){
     if (!params || !params.client){
         throw {
@@ -10,6 +37,7 @@ function TopicManager(params){
     }
     
     this.client = params.client;
+    this.authData = params.authData;
 }
 
 TopicManager.prototype.getTopic = function(params){
@@ -20,7 +48,7 @@ TopicManager.prototype.getTopic = function(params){
         };
     }
     
-    var namespace = params.namespaceName ? params.namespaceName : config.defaultNameSpace;
+    var namespace = params.namespace ? params.namespace : config.defaultNameSpace;
 	var key = namespace + "/" + params.topicName;
     var topicConfig = config.topicConfig[key];
     var resourceGroupName = params.resourceGroupName ? params.resourceGroupName : topicConfig.resourceGroupName;
@@ -28,29 +56,41 @@ TopicManager.prototype.getTopic = function(params){
     var subscriptionId = params.subscriptionId ? params.subscriptionId : topicConfig.subscriptionId;
     
     var reqParams = {
-        "url": "https://" + namespace + "/subscriptions/"+ subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.ServiceBus/namespaces/" + 				namespace + "/topics/" + params.topicName + (apiVersion ? "?api-version=" + apiVersion : ""),
+        "url": config.managementPrefix + "/subscriptions/"+ subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.ServiceBus/namespaces/" + 				namespace + "/topics/" + params.topicName + "?api-version=" + apiVersion,
         "method": "GET"
     };
     
-    var topic = topicModule;
-    topic = this.client.callApi(reqParams);
-    return topic;
+    var topicData = this.client.callApi(reqParams, this.authData);
+    console.log(JSON.stringify(topicData))
+    topicData.client = this.client;
+    topicData.path = topicData.name;
+    var myTopic = new topicModule.Topic(topicData);
+    return myTopic;
 }
 
 TopicManager.prototype.listTopics = function(params){
     
-    var namespace = params.namespaceName ? params.namespaceName : config.defaultNameSpace;
-	var key = namespace + "/" + params.topicName;
+    var namespace = params && params.namespace ? params.namespace : config.defaultNameSpace;
+	var key = namespace;
     var topicConfig = config.topicConfig[key];
-    var resourceGroupName = params.resourceGroupName ? params.resourceGroupName : topicConfig.resourceGroupName;
-    var apiVersion = params.apiVersion ? params.apiVersion : topicConfig.apiVersion;
-    var subscriptionId = params.subscriptionId ? params.subscriptionId : topicConfig.subscriptionId;
+    var resourceGroupName = params && params.resourceGroupName ? params.resourceGroupName : topicConfig.resourceGroupName;
+    var apiVersion = params && params.apiVersion ? params.apiVersion : topicConfig.apiVersion;
+    var subscriptionId = params && params.subscriptionId ? params.subscriptionId : topicConfig.subscriptionId;
     
     var reqParams = {
         
-        "url": "https://" + namespace + "/subscriptions/"+ subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.ServiceBus/namespaces/" + namespace + "/topics" + (apiVersion ? "?api-version=" + apiVersion : ""),
+        "url": config.managementPrefix + "/subscriptions/"+ subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.ServiceBus/namespaces/" + namespace + "/topics" + "?api-version=" + apiVersion,
         "method": "GET"
     }
     
-    return client.callApi(reqParams);
+    var topics = new Array();
+    topics = this.client.callApi(reqParams, this.authData);
+    for (i = 0; i < topics.length; i++){
+        topics[i].client = this.client;
+        topics[i].path = topics[i].name;
+        topics[i] = new topicModule.Topic(topics[i]);
+        
+    }
+    
+    return topics;
 }
