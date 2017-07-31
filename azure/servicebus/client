@@ -1,6 +1,6 @@
 var http = require("http");
 var tokenGenerator = require("/azure/authentication/tokengenerator");
-var parse = require("/azure/util/parse");
+var parser = require("/azure/util/parser");
 
 /*const ERROR_MSGS = {
     "400": {
@@ -90,7 +90,7 @@ Client.prototype._callApi = function(params, authData) {
     var response = http.request(params);
     //console.log("Received following response: " + JSON.stringify(response));
     if (response.status >= "200" && response.status < "300") {
-        var responseBody = response.body ? parse.parse(response.body) : "";
+        var responseBody = response.body ? parser.parse(response.body) : "";
         var brokerProperties = response.headers.BrokerProperties;
         if (brokerProperties){
             responseBody.brokerProperties = JSON.parse(brokerProperties);
