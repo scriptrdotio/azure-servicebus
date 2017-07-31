@@ -8,7 +8,7 @@ var config = require("./config");
 * @param {Object} [params.name]
 */
 function Topic(params){
-    if (!params){
+    if (!params || !params.client || !params.name){
         throw {
             "errorCode": "Missing_Parameter",
             "errorDetail": "Client and Name - Params cannot be null or empty"
