@@ -2,18 +2,18 @@ var document = require("document");
 var authmodefactoryModule = require("./authmodefactory");
 
 /*
- * signature-string = SHA-256('https://<yournamespace>.servicebus.windows.net/'+'\n'+ 1438205742)
- * SharedAccessSignature sig=<signature-string>&se=<expiry>&skn=<keyName>&sr=<URL-encoded-resourceURI>
- * @function generateSignature
- * @param {Object} params: expected parameters
- * @param {Numeric} expiry in seconds e.g. 1438205742 (date in seconds). Optional, defaults to DEFAULT_EXP
- * @param {String} keyName: hask key name (actually the name of the policy). Optional, defaults to /azure/servicebus/config.policy
- * @param {String} key: the secret key to use to generate the hash. Defaults to /azure/servicebus/config.hashKey
- * @param {String} resource: the targeted resource on the service, e.g.https://<yournamespace>.servicebus.windows.net/testqueue
+ * @class tokengenerator
+ * @constructor
  */
-
 function TokenGenerator(){}
 
+/*
+ * @method loadToken
+ * @param {Object} [params]: expected parameters
+ * @param {String} [params.resource]
+ * @param {String} [params.authMode]
+ * @return {Object}
+ */
 TokenGenerator.prototype.loadToken = function(params){
     var queryObj = {
         query: 'type = "token" and resource = "' + params.resource +  '" and authMode = "' + params.authMode + '"',
@@ -32,6 +32,13 @@ TokenGenerator.prototype.loadToken = function(params){
     return resp.result.documents[0];
 }
 
+/*
+ * @method getSignature
+ * @param {Object} [params]: expected parameters
+ * @param {String} [params.resource]
+ * @param {String} [params.authMode]
+ * @return {String} token
+ */
 TokenGenerator.prototype.getSignature = function(params){
     log.info("TokenGenerator.getSignature received " + JSON.stringify(params));
     var authmodefactory = new authmodefactoryModule.AuthModeFactory();
