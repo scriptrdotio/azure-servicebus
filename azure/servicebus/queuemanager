@@ -6,28 +6,7 @@ var queueModule = require("/azure/servicebus/queue");
  * @constructor
  * @param {Object} [params]: expected parameters
  * @param {Object} [params.client]
- *
- * @method getQueue
- * @param {Object} [params]: expected parameters
- * @param {String} [params.queueName]
- * @param {String} [params.namespace] (optional) defaults to config.defaultNameSpace
- * @param {String} [params.resourceGroupName] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].resourceGroupName
- * @param {String} [params.apiVersion] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].apiVersion
- * @param {String} [params.subscriptionId] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].subscriptionId
- * @return {Object} instance of Queue
- * @throw {Error}
- *
- * @method listQueues
- * @param {Object} [params]: expected parameters
- * @param {String} [params.queueName]
- * @param {String} [params.namespace] (optional) defaults to config.defaultNameSpace
- * @param {String} [params.resourceGroupName] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].resourceGroupName
- * @param {String} [params.apiVersion] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].apiVersion
- * @param {String} [params.subscriptionId] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].subscriptionId
- * @return {Object} array of instances of Queue
- * @throw {Error}
  */
-
 function QueueManager(params){
     if (!params || !params.client){
         throw {
@@ -40,6 +19,17 @@ function QueueManager(params){
     this.authData = params.authData;
 }
 
+/*
+ * @method getQueue
+ * @param {Object} [params]: expected parameters
+ * @param {String} [params.queueName]
+ * @param {String} [params.namespace] (optional) defaults to config.defaultNameSpace
+ * @param {String} [params.resourceGroupName] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].resourceGroupName
+ * @param {String} [params.apiVersion] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].apiVersion
+ * @param {String} [params.subscriptionId] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].subscriptionId
+ * @return {Object} instance of Queue
+ * @throw {Error}
+ */
 QueueManager.prototype.getQueue = function(params){
     if (!params || !params.queueName){
         throw {
@@ -67,6 +57,17 @@ QueueManager.prototype.getQueue = function(params){
     return myQueue;
 }
 
+/*
+ * @method listQueues
+ * @param {Object} [params]: expected parameters
+ * @param {String} [params.queueName]
+ * @param {String} [params.namespace] (optional) defaults to config.defaultNameSpace
+ * @param {String} [params.resourceGroupName] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].resourceGroupName
+ * @param {String} [params.apiVersion] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].apiVersion
+ * @param {String} [params.subscriptionId] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].subscriptionId
+ * @return {Object} array of instances of Queue
+ * @throw {Error}
+ */
 QueueManager.prototype.listQueues = function(params){
     
     var namespace = params && params.namespace ? params.namespace : config.defaultNameSpace;
