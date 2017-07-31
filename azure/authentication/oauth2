@@ -1,13 +1,31 @@
 var http = require("http");
 
+/*
+ * @class oauth2
+ * @constructor
+ */
 function Oauth2(){}
 
-Oauth2.prototype.generateSignature = function(){
+/*
+ * @method generateSignature
+ * @param {Object} [params]: expected parameters
+ * @param {String} [params.client_id]
+ * @param {String} [params.client_secret]
+ * @return {Object} token, expiry
+ * @throw {Error}
+ */
+Oauth2.prototype.generateSignature = function(params){
+    if (!params || !params.client_id || !params.client_secret){
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "client_id and client_secret are mandatory fields"
+        };
+    }
     var targetResource = "https://management.azure.com/";
     var reqParams = {
         grant_type: "client_credentials",
-        client_id: "0b250c56-2acd-42c1-b5b8-70c409eb0253",
-        client_secret: "LyL6GERHQNi9obGGiiImttk4K+ggXCE6HkScV0y0pwg=",
+        client_id: params.client_id,
+        client_secret: params.client_secret,
         resource: targetResource
     };
 
