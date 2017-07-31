@@ -6,28 +6,7 @@ var topicModule = require("/azure/servicebus/topic");
  * @constructor
  * @param {Object} [params]: expected parameters
  * @param {Object} [params.client]
- *
- * @method getTopic
- * @param {Object} [params]: expected parameters
- * @param {String} [params.topicName]
- * @param {String} [params.namespace] (optional) defaults to config.defaultNameSpace
- * @param {String} [params.resourceGroupName] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].resourceGroupName
- * @param {String} [params.apiVersion] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].apiVersion
- * @param {String} [params.subscriptionId] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].subscriptionId
- * @return {Object} instance of topic
- * @throw {Error}
- *
- * @method listTopics
- * @param {Object} [params]: expected parameters
- * @param {String} [params.topicName]
- * @param {String} [params.namespace] (optional) defaults to config.defaultNameSpace
- * @param {String} [params.resourceGroupName] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].resourceGroupName
- * @param {String} [params.apiVersion] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].apiVersion
- * @param {String} [params.subscriptionId] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].subscriptionId
- * @return {Object} array of instances of topic
- * @throw {Error}
  */
-
 function TopicManager(params){
     if (!params || !params.client){
         throw {
@@ -40,6 +19,17 @@ function TopicManager(params){
     this.authData = params.authData;
 }
 
+/*
+ * @method getTopic
+ * @param {Object} [params]: expected parameters
+ * @param {String} [params.topicName]
+ * @param {String} [params.namespace] (optional) defaults to config.defaultNameSpace
+ * @param {String} [params.resourceGroupName] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].resourceGroupName
+ * @param {String} [params.apiVersion] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].apiVersion
+ * @param {String} [params.subscriptionId] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].subscriptionId
+ * @return {Object} instance of topic
+ * @throw {Error}
+ */
 TopicManager.prototype.getTopic = function(params){
     if (!params || !params.topicName){
         throw {
@@ -68,6 +58,17 @@ TopicManager.prototype.getTopic = function(params){
     return myTopic;
 }
 
+/*
+ * @method listTopics
+ * @param {Object} [params]: expected parameters
+ * @param {String} [params.topicName]
+ * @param {String} [params.namespace] (optional) defaults to config.defaultNameSpace
+ * @param {String} [params.resourceGroupName] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].resourceGroupName
+ * @param {String} [params.apiVersion] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].apiVersion
+ * @param {String} [params.subscriptionId] (optional) defaults to config.topicConfig[defaultNameSpace + "/testtopic"].subscriptionId
+ * @return {Object} array of instances of topic
+ * @throw {Error}
+ */
 TopicManager.prototype.listTopics = function(params){
     
     var namespace = params && params.namespace ? params.namespace : config.defaultNameSpace;
