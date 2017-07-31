@@ -1,6 +1,33 @@
 var config = require("/azure/servicebus/config");
 var queueModule = require("/azure/servicebus/queue");
 
+/*
+ * @class QueueManager
+ * @constructor
+ * @param {Object} [params]: expected parameters
+ * @param {Object} [params.client]
+ *
+ * @method getQueue
+ * @param {Object} [params]: expected parameters
+ * @param {String} [params.queueName]
+ * @param {String} [params.namespace] (optional) defaults to config.defaultNameSpace
+ * @param {String} [params.resourceGroupName] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].resourceGroupName
+ * @param {String} [params.apiVersion] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].apiVersion
+ * @param {String} [params.subscriptionId] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].subscriptionId
+ * @return {Object} instance of Queue
+ * @throw {Error}
+ *
+ * @method listQueues
+ * @param {Object} [params]: expected parameters
+ * @param {String} [params.queueName]
+ * @param {String} [params.namespace] (optional) defaults to config.defaultNameSpace
+ * @param {String} [params.resourceGroupName] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].resourceGroupName
+ * @param {String} [params.apiVersion] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].apiVersion
+ * @param {String} [params.subscriptionId] (optional) defaults to config.queueConfig[defaultNameSpace + "/testqueue"].subscriptionId
+ * @return {Object} array of instances of Queue
+ * @throw {Error}
+ */
+
 function QueueManager(params){
     if (!params || !params.client){
         throw {
@@ -10,6 +37,7 @@ function QueueManager(params){
     }
     
     this.client = params.client;
+    this.authData = params.authData;
 }
 
 QueueManager.prototype.getQueue = function(params){
@@ -20,7 +48,7 @@ QueueManager.prototype.getQueue = function(params){
         };
     }
     
-    var namespace = params.namespaceName ? params.namespaceName : config.defaultNameSpace;
+    var namespace = params.namespace ? params.namespace : config.defaultNameSpace;
 	var key = namespace + "/" + params.queueName;
     var queueConfig = config.queueConfig[key];
     var resourceGroupName = params.resourceGroupName ? params.resourceGroupName : queueConfig.resourceGroupName;
@@ -28,29 +56,39 @@ QueueManager.prototype.getQueue = function(params){
     var subscriptionId = params.subscriptionId ? params.subscriptionId : queueConfig.subscriptionId;
     
     var reqParams = {
-        "url": "https://" + namespace + "/subscriptions/"+ subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.ServiceBus/namespaces/" + namespace + "/queues/" + params.queueName + (apiVersion ? "?api-version=" + apiVersion : ""),
+        "url": config.managementPrefix + "/subscriptions/"+ subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.ServiceBus/namespaces/" + namespace + "/queues/" + params.queueName + "?api-version=" + apiVersion,
         "method": "GET"
     };
     
-    var queue = queueModule;
-    queue = this.client.callApi(reqParams);
-    return queue;
+    var queueData = this.client.callApi(reqParams, this.authData);
+    queueData.client = this.client;
+    queueData.path = queueData.name;
+    var myQueue = new queueModule.Queue(queueData);
+    return myQueue;
 }
 
 QueueManager.prototype.listQueues = function(params){
     
-    var namespace = params.namespaceName ? params.namespaceName : config.defaultNameSpace;
-	var key = namespace + "/" + params.queueName;
+    var namespace = params && params.namespace ? params.namespace : config.defaultNameSpace;
+	var key = namespace;
     var queueConfig = config.queueConfig[key];
-    var resourceGroupName = params.resourceGroupName ? params.resourceGroupName : queueConfig.resourceGroupName;
-    var apiVersion = params.apiVersion ? params.apiVersion : queueConfig.apiVersion;
-    var subscriptionId = params.subscriptionId ? params.subscriptionId : queueConfig.subscriptionId;
+    var resourceGroupName = params && params.resourceGroupName ? params.resourceGroupName : queueConfig.resourceGroupName;
+    var apiVersion = params && params.apiVersion ? params.apiVersion : queueConfig.apiVersion;
+    var subscriptionId = params && params.subscriptionId ? params.subscriptionId : queueConfig.subscriptionId;
     
     var reqParams = {
         
-        "url": "https://" + namespace + "/subscriptions/"+ subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.ServiceBus/namespaces/" + namespace + "/queues" + (apiVersion ? "?api-version=" + apiVersion : ""),
+        "url": config.managementPrefix + "/subscriptions/"+ subscriptionId + "/resourceGroups/" + resourceGroupName + "/providers/Microsoft.ServiceBus/namespaces/" + namespace + "/queues" + "?api-version=" + apiVersion,
         "method": "GET"
     }
     
-    return client.callApi(reqParams);
+    var queues = new Array();
+    queues = this.client.callApi(reqParams, this.authData);
+    for (i = 0; i < queues.length; i++){
+        queues[i].client = this.client;
+        queues[i].path = queues[i].id;
+        queues[i] = new queueModule.Queue(queues[i]);
+    }
+    
+    return queues;
 }
