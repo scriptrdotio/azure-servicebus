@@ -6,6 +6,20 @@ var busConfig = require("../servicebus/config");
 const DEFAULT_EXP = 3600;
 const DEFAULT_KEY_NAME = "SendListen";
 
+/* 
+ * @class sas
+ * @constructor
+ *
+ * signature-string = SHA-256('https://<yournamespace>.servicebus.windows.net/'+'\n'+ 1438205742)
+ * SharedAccessSignature sig=<signature-string>&se=<expiry>&skn=<keyName>&sr=<URL-encoded-resourceURI>
+ * @function generateSignature
+ * @param {Object} params: expected parameters
+ * @param {Numeric} expiry in seconds e.g. 1438205742 (date in seconds). Optional, defaults to DEFAULT_EXP
+ * @param {String} keyName: hask key name (actually the name of the policy). Optional, defaults to /azure/servicebus/config.policy
+ * @param {String} key: the secret key to use to generate the hash. Defaults to /azure/servicebus/config.hashKey
+ * @param {String} resource: the targeted resource on the service, e.g.https://<yournamespace>.servicebus.windows.net/testqueue
+ */
+
 function SAS(){}
 
 SAS.prototype.generateSignature = function (params) {  
