@@ -1,0 +1,37 @@
+var topic = require("../azure/servicebus/topic");
+var client = require("../azure/servicebus/client");
+var document = require("document"); 
+
+try{
+    var sigParams = {
+        "resource": "https://scriptrio.servicebus.windows.net/testtopic",
+        "authMode": "sas"
+    };
+
+    var myClient = new client.Client(sigParams);
+    //console.log(JSON.stringify(myClient));
+
+    var param = {
+        client: myClient,
+        name: "interntopic"
+    }
+
+    var myTopic = new topic.Topic(param);
+
+    //log.info(request.body.speed);
+    var fields = {
+        speed: request.body.speed,
+        "meta.types": {
+            speed: "numeric"
+        }
+    }
+
+    document.create(fields);
+    publish("responseChannel", {id:"power", result: request.body.power});
+    var device = require("./list");
+	device.listSpeed();
+    return myTopic.sendMessage(JSON.stringify(request.body));
+
+}catch (exception){
+    return exception;
+}

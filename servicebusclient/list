@@ -1,0 +1,18 @@
+var document = require("document"); 
+
+function listSpeed() {
+    var request = { // retrieve all documents where temperature >= 0
+        "query": "speed<numeric> >= 0",
+        "fields": "speed, creationDate", // fields to return (key and version number are automatically added)    
+        "resultsPerPage": 10
+    };
+
+    var resp = document.query(request);
+    if (resp.metadata.status == "failure") {
+        return "error";
+    }
+
+    var docs = resp.result.documents;
+    publish("responseChannel",{"id": "speed", "result":docs});
+    return docs;
+}
