@@ -111,10 +111,10 @@
                 <li class="myItem" gridster-item='{sizeX: 1, sizeY: 1, col: 0 , row: 0 }'>
                     <div class="box">
                         <div class="box-content">
-                          <div  style="height: 30px;" tooltip-placement="bottom" uib-tooltip="Gauge" class="box-label">Gauge</div>
+                          <div  style="height: 30px;" tooltip-placement="bottom" uib-tooltip="Power" class="box-label">Power</div>
                           <div  style="height: calc(100% - 30px)" > <scriptr-gauge
                                       	transport= 'wss' 
-                                      	boxLabel= 'Gauge' 
+                                      	boxLabel= 'Power' 
                                       	msg-tag= 'power' 
                                       	data= '30' 
                                       	value-font-color= '#999' 
@@ -159,16 +159,16 @@
                 <li class="myItem" gridster-item='{sizeX: 2, sizeY: 2, col: 1 , row: 0 }'>
                     <div class="box">
                         <div class="box-content">
-                          <div  style="height: 30px;" tooltip-placement="bottom" uib-tooltip="Line Chart" class="box-label">Line Chart</div>
+                          <div  style="height: 30px;" tooltip-placement="bottom" uib-tooltip="Speed" class="box-label">Speed</div>
                           <div  style="height: calc(100% - 30px)" > <scriptr-chart
                                       	type= 'line' 
-                                      	boxLabel= 'Line Chart' 
+                                      	boxLabel= 'Speed' 
                                       	xkey= 'creationDate' 
                                       	ykeys= '["speed"]' 
                                       	labels= '["speed"]' 
                                       	colors= '["#FCC717","#38B9D6"]' 
                                       	transport= 'wss' 
-                                      	msg-tag= 'speed' 
+                                      	msg-tag= 'speedHistory' 
                                       	data= '[{"y": 2006, "a": 2, "b": 3 }, { "y": 2007, "a": 82, "b": 68 }, { "y": 2009, "a": 70, "b": 99 }, { "y":2010, "a": 30, "b": 64 }, { "y": 2011, "a": 72, "b":100 }, { "y": 2012, "a": 81, "b": 81 }, { "y": 2013,"a": 52, "b": 39 } ]' 
                                       	grid-text-family= 'Source Sans Pro' 
                                       	line-width= '3' 
@@ -195,6 +195,95 @@
                                       	goals= '[null]' 
                                       	events= '[null]' 
                                       	api= 'servicebusclient/listspeedapi' 
+                           ></scriptr-chart> </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="myItem" gridster-item='{sizeX: 1, sizeY: 1, col: 0 , row: 1 }'>
+                    <div class="box">
+                        <div class="box-content">
+                          <div  style="height: 30px;" tooltip-placement="bottom" uib-tooltip="Speed" class="box-label">Speed</div>
+                          <div  style="height: calc(100% - 30px)" > <scriptr-gauge
+                                      	transport= 'wss' 
+                                      	boxLabel= 'Speed' 
+                                      	msg-tag= 'speed' 
+                                      	data= '30' 
+                                      	value-font-color= '#999' 
+                                      	min= '0' 
+                                      	max= '100' 
+                                      	hide-min-max= 'false' 
+                                      	hide-value= 'false' 
+                                      	show-inner-shadow= 'false' 
+                                      	custom-sectors= '{"percents":"false","ranges":[{}]}' 
+                                      	shadow-size= '5' 
+                                      	shadow-opacity= '0.2' 
+                                      	start-animation-type= 'linear' 
+                                      	refresh-animation-type= 'linear' 
+                                      	value-font-family= 'Source Sans Pro' 
+                                      	value-min-font-size= '12' 
+                                      	label-min-font-size= '12' 
+                                      	min-label-min-font-size= '12' 
+                                      	max-label-min-font-size= '12' 
+                                      	gauge-width-scale= '1' 
+                                      	shadow-vertical-offset= '3' 
+                                      	level-colors= '["#a9d70b","#f9c802","#ff0000"]' 
+                                      	relative-gauge-size= 'true' 
+                                      	no-gradient= 'false' 
+                                      	start-animation-time= '700' 
+                                      	refresh-animation-time= '700' 
+                                      	donut= 'false' 
+                                      	donut-start-angle= '90' 
+                                      	reverse= 'false' 
+                                      	decimals= '0' 
+                                      	format-number= 'false' 
+                                      	human-friendly= 'false' 
+                                      	human-friendly-decimal= '0' 
+                                      	pointer= 'false' 
+                                      	counter= 'false' 
+                                      	http-method= 'GET' 
+                           ></scriptr-gauge> </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="myItem" gridster-item='{sizeX: 2, sizeY: 2, col: 3 , row: 0 }'>
+                    <div class="box">
+                        <div class="box-content">
+                          <div  style="height: 30px;" tooltip-placement="bottom" uib-tooltip="Power" class="box-label">Power</div>
+                          <div  style="height: calc(100% - 30px)" > <scriptr-chart
+                                      	type= 'line' 
+                                      	boxLabel= 'Power' 
+                                      	xkey= 'creationDate' 
+                                      	ykeys= '["power"]' 
+                                      	labels= '["power"]' 
+                                      	colors= '["#FCC717","#38B9D6"]' 
+                                      	transport= 'wss' 
+                                      	msg-tag= 'powerHistory' 
+                                      	data= '[{"y": 2006, "a": 2, "b": 3 }, { "y": 2007, "a": 82, "b": 68 }, { "y": 2009, "a": 70, "b": 99 }, { "y":2010, "a": 30, "b": 64 }, { "y": 2011, "a": 72, "b":100 }, { "y": 2012, "a": 81, "b": 81 }, { "y": 2013,"a": 52, "b": 39 } ]' 
+                                      	grid-text-family= 'Source Sans Pro' 
+                                      	line-width= '3' 
+                                      	point-size= '4' 
+                                      	point-stroke-colors= '["#fff"]' 
+                                      	ymax= 'auto' 
+                                      	ymin= 'auto 0' 
+                                      	smooth= 'true' 
+                                      	hide-hover= 'false' 
+                                      	parse-time= 'true' 
+                                      	xlabels= 'auto' 
+                                      	xlabel-angle= '0' 
+                                      	goal-stroke-width= '1' 
+                                      	goal-line-colors= '["#666633","#999966","#cc6666","#663333"]' 
+                                      	event-stroke-width= '1' 
+                                      	event-line-colors= '["#005a04","#ccffbb","#3a5f0b","#005502"]' 
+                                      	axes= 'true' 
+                                      	grid= 'true' 
+                                      	grid-text-color= '#888' 
+                                      	grid-text-size= '12' 
+                                      	grid-text-weight= 'normal' 
+                                      	http-method= 'GET' 
+                                      	point-fill-colors= '[null]' 
+                                      	goals= '[null]' 
+                                      	events= '[null]' 
+                                      	api= 'servicebusclient/listpowerapi' 
                            ></scriptr-chart> </div>
                         </div>
                     </div>

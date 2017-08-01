@@ -13,6 +13,23 @@ function listSpeed() {
     }
 
     var docs = resp.result.documents;
-    publish("responseChannel",{"id": "speed", "result":docs});
+    publish("responseChannel",{"id": "speedHistory", "result":docs});
+    return docs;
+}
+
+function listPower() {
+    var request = {
+        "query": "power<numeric> >= 0",
+        "fields": "power, creationDate", // fields to return (key and version number are automatically added)    
+        "resultsPerPage": 10
+    };
+
+    var resp = document.query(request);
+    if (resp.metadata.status == "failure") {
+        return "error";
+    }
+
+    var docs = resp.result.documents;
+    publish("responseChannel",{"id": "powerHistory", "result":docs});
     return docs;
 }

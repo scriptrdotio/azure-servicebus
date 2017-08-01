@@ -2,12 +2,12 @@
     <script src= "./lib/scriptrio.js"></script>
     <script src= "./lib/PubSubClient.js"></script>
     <script>
-        var scriptr = new Scriptr({token:"VjIwRjI1NzEyMTpjbGllbnQ6Qzc0NjdGMzU0OTM1NDhBN0ZDNzMzMDBFRkFCMjE5QTY="});
+        var scriptr = new Scriptr({token:"TjgzQUMyRjU5MzpjbGllbnQ6NUY5NTFDQ0RGNzgxQzQ3MDVCRjM2Mzg1QTE5OEUzM0U="}); //token of the device (Device Directory)
         var rand = new Array(3);
         
         setInterval(function(){
             for (i = 0; i < rand.length; i++) { 
-                rand[i] = Math.floor((Math.random() * 40) + 1); //between 1 and 40
+                rand[i] = Math.floor((Math.random() * 20) + 20); //between 1 and 40
             };
             scriptr.publish("servicebusclient", JSON.stringify({"power": rand[0], "speed": rand[1], "temperature": rand[2]}));
         },5000)

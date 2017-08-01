@@ -1,0 +1,2 @@
+var device = require("./list");
+return device.listPower();

@@ -3,11 +3,12 @@ var client = require("../azure/servicebus/client");
 var document = require("document"); 
 
 try{
+    
     var sigParams = {
         "resource": "https://scriptrio.servicebus.windows.net/testtopic",
         "authMode": "sas"
     };
-
+    
     var myClient = new client.Client(sigParams);
     //console.log(JSON.stringify(myClient));
 
@@ -19,17 +20,22 @@ try{
     var myTopic = new topic.Topic(param);
 
     //log.info(request.body.speed);
+    
     var fields = {
         speed: request.body.speed,
+        power: request.body.power,
         "meta.types": {
-            speed: "numeric"
+            speed: "numeric",
+            power: "numeric"
         }
     }
 
     document.create(fields);
+    publish("responseChannel", {id:"speed", result: request.body.speed});
     publish("responseChannel", {id:"power", result: request.body.power});
     var device = require("./list");
 	device.listSpeed();
+    device.listPower();
     return myTopic.sendMessage(JSON.stringify(request.body));
 
 }catch (exception){
