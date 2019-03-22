@@ -1,4 +1,4 @@
-var hashKey = "huVFZYhPfTpCXqi9jbkLsQVX0Sd+gcv6MDxYOtz8Gww=";
+var hashKey = "your_hash_key";
 
 var policy = "SendListen";
 
@@ -10,7 +10,7 @@ var defaultResourceGroupName = "connector";
 
 var defaultApiVersion = "2015-08-01";
 
-var defaultSubscriptionId = "275e2b4d-b936-49de-96a6-9e5bc9d41bbd";
+var defaultSubscriptionId = "your_subscription_id";
 
 var queueConfig = {};
 var topicConfig = {};
