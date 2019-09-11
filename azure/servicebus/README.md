@@ -93,7 +93,7 @@ You can use the queue.readMessage() method to read a message from the queue
 ```
 var msgObject = queue.readMessage(); // this removes the message from the queue
 ```
-You can also do a *non-destructive* read (i.e. keep the message in the queue), using the queue.readLock() method
+You can also do a *non-destructive* read (i.e. keep the message in the queue), using the queue.readLockMessage() method
 ```
 var msgObjectStillInQueue = queue.readLockMessage ();
 ```
@@ -115,18 +115,18 @@ You can use the topic.readMessage(subscriptionName) method to read a message fro
 ```
 var msgObject = topic.readMessage("mysubscription"); // this removes the message from the topic
 ```
-You can also do a *non-destructive* read (i.e. keep the message in the queue), using the queue.readLock() method
+You can also do a *non-destructive* read (i.e. keep the message in the topic), using the topic.readLockMessage(subscriptionName) method
 ```
-var msgObjectStillInQueue = queue.readLockMessage ();
+var msgObjectStillInTopic = topic.readLockMessage ("mysubscription");
 ```
-Use the queue.sendMessage() method to push a message to your service bus queue
+Use the topic.sendMessage(subscription_name) method to push a message to your service bus queue
 ```
 var someMsgString = "a_string_can_be_a_stringified_json";
-var result = queue.sendMessage(someMsgString);
+var result = topic.sendMessage(someMsgString);
 ```
 You can also push a list of messages in one call:
 ```
 var listOfMsgStrings = ["some_string1", "some_string2"];
-var listPushResult = queue.sendMessageBatch(listOfMsgStrings);
+var listPushResult = topic.sendMessageBatch(listOfMsgStrings);
 ```
-More methods can be found in the [queue script](./azure/servicebus/queue)
+More methods can be found in the [topic script](./azure/servicebus/topic)
