@@ -107,6 +107,26 @@ You can also push a list of messages in one call:
 var listOfMsgStrings = ["some_string1", "some_string2"];
 var listPushResult = queue.sendMessageBatch(listOfMsgStrings);
 ```
+More methods can be found in the [queue script](./azure/servicebus/queue)
 
+# 7. Read messages from a topic and publish messages to a topic
 
-
+You can use the topic.readMessage(subscriptionName) method to read a message from the topc
+```
+var msgObject = topic.readMessage("mysubscription"); // this removes the message from the topic
+```
+You can also do a *non-destructive* read (i.e. keep the message in the queue), using the queue.readLock() method
+```
+var msgObjectStillInQueue = queue.readLockMessage ();
+```
+Use the queue.sendMessage() method to push a message to your service bus queue
+```
+var someMsgString = "a_string_can_be_a_stringified_json";
+var result = queue.sendMessage(someMsgString);
+```
+You can also push a list of messages in one call:
+```
+var listOfMsgStrings = ["some_string1", "some_string2"];
+var listPushResult = queue.sendMessageBatch(listOfMsgStrings);
+```
+More methods can be found in the [queue script](./azure/servicebus/queue)
