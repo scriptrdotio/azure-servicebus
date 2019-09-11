@@ -46,7 +46,7 @@ var topicmanagerModule = require("/azure/servicebus/topicmanager");
 var clientModule = require("/azure/servicebus/client");
 ```
 
-# Second step - generate an authentication token
+# 3. Generate an authentication token
 
 Create an instance of the TokenGenerator class using the TokenGenerator() factory method of the tokenGeneratorModule
 ```
@@ -54,11 +54,44 @@ var tokengenerator = new tokengeneratorModule.TokenGenerator();
 ```
 Then ask the token generator to generate an access token to provide access to the targeted resource (a queue or topic of the service bus)
 ```
-var sigParams = {       
+var signatureParameters = {       
   resource: "https://your_azure_subdomain.servicebus.windows.net/your_queue_or_topic_name" 
 };
-var token = tokengenerator.generateSignature(sigParams);
+var token = tokengenerator.generateSignature(signatureParameters);
 ```
+# 4. Create an instance of the Client class
+
+Create an instance of the generic Client class that handles the http requests and response to/from the service bus REST API. This instance will be passed to instances of the QueueManager and TopicManager classes.
+```
+ var client = new clientModule.Client(sigParams);
+ ```
+ 
+ # 5. Create an instance of a Queue and an instance of a Topic.
+ 
+Instances of the Queue and Topic classes are used to interact with service bus queues and topics (a topic is a queue that can broadcast messages to multiple listeners - subscribers). You will usually obtain instance of these classes respectively from instances of the QueueManager and TopicManager classes. So let's first see how to create this instances:
+ 
+```
+// invoke the QueueManager() factory method of the queueManager module, passing the generic client
+var queuemanager = new queuemanagerModule.QueueManager({client: client});
+// invoke the TopicManager() factory method of the queueManager module, passing the generic client
+var topicmanager = new topicmanagerModule.TopicManager({client: client});
+```
+
+To obtain a instance of a Queue class, proceed as follows using the instance of QueueManager:
+```
+// pass the name of the queue as a parameter of getQueue()
+var queue = queuemanager.getQueue({queueName: "testqueue"});
+```
+
+To obtain a instance of a Topic class, proceed as follows using the instance of TopicManager:
+```
+// pass the name of the topci as a parameter of getTopic()
+var topic = topicmanager.getTopic({topicName: "testtopic"});
+```
+
+# 6. Read messages from a queue and send messages to a queue
+
+
 
 
 
