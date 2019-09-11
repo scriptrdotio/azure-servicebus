@@ -76,13 +76,11 @@ var queuemanager = new queuemanagerModule.QueueManager({client: client});
 // invoke the TopicManager() factory method of the queueManager module, passing the generic client
 var topicmanager = new topicmanagerModule.TopicManager({client: client});
 ```
-
 To obtain a instance of a Queue class, proceed as follows using the instance of QueueManager:
 ```
 // pass the name of the queue as a parameter of getQueue()
 var queue = queuemanager.getQueue({queueName: "testqueue"});
 ```
-
 To obtain a instance of a Topic class, proceed as follows using the instance of TopicManager:
 ```
 // pass the name of the topci as a parameter of getTopic()
@@ -91,7 +89,24 @@ var topic = topicmanager.getTopic({topicName: "testtopic"});
 
 # 6. Read messages from a queue and send messages to a queue
 
-
+You can use the queue.readMessage() method to read a message from the queue
+```
+var msgObject = queue.readMessage(); // this removes the message from the queue
+```
+You can also do a *non-destructive* read (i.e. keep the message in the queue), using the queue.readLock() method
+```
+var msgObjectStillInQueue = queue.readLockMessage ();
+```
+Use the queue.sendMessage() method to push a message to your service bus queue
+```
+var someMsgString = "a_string_can_be_a_stringified_json";
+var result = queue.sendMessage(someMsgString);
+```
+You can also push a list of messages in one call:
+```
+var listOfMsgStrings = ["some_string1", "some_string2"];
+var listPushResult = queue.sendMessageBatch(listOfMsgStrings);
+```
 
 
 
