@@ -5,7 +5,9 @@ This repository contains a simple implementation of a scriptr.io connector that 
 - [The connector](./azure/servicebus)
 - [The demo client application](./servicebusclient)
 
+# Pre-requisites
 
-
+- You should have an account on [portal.azure.com](https://portal.azure.com). You also need to configure this account to generate shared access keys, queues and topics.
+- You should have an account on [scriptr.io](https://www.scriptr.io/workspace)
 
 
